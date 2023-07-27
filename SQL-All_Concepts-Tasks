@@ -1,0 +1,131 @@
+1. each nation name wise no of orders booked
+A. SELECT N.N_NAME Nation_Name, COUNT(O.O_ORDERKEY) No_of_Orders FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.NATION N INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.CUSTOMER ON(N_NATIONKEY = C_NATIONKEY) INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS O ON(C_CUSTKEY = O_CUSTKEY) GROUP BY N.N_NAME;
+
+2. each customer name wise no of line items
+A. SELECT C.C_NAME Customer_Name, COUNT(L.L_ORDERKEY) No_of_Line_Items FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.CUSTOMER C INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS O ON(C_CUSTKEY = O_CUSTKEY) INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.LINEITEM L ON(O_ORDERKEY = L_ORDERKEY) GROUP BY C.C_NAME;
+
+3. write a query to get the below columns with filter crieteria
+* select cust_id,cust_name,order_id,order_amount,order_status,nation_name,line_number,order_prority
+* nations shoud be GERMANY and INDIA and order_proority should be not-specified
+* and order_amount less then 100000
+A. SELECT C.C_CUSTKEY Cust_Id, C.C_NAME Cust_Name, O.O_ORDERKEY Order_Id, O.O_TOTALPRICE Order_Amount, O.O_ORDERSTATUS Order_Status, N.N_NAME Nation_Name, L.L_LINENUMBER Line_Number, O.O_ORDERPRIORITY Order_Priority FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.NATION N INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.CUSTOMER C ON(C.C_NATIONKEY = N.N_NATIONKEY) INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS O ON(C.C_CUSTKEY = O.O_CUSTKEY) INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.LINEITEM L ON(O.O_ORDERKEY = L.L_ORDERKEY) WHERE Nation_Name IN ('GERMANY', 'INDIA') AND Order_Priority = '4- NOT SPECIFIED' AND Order_Amount < 100000;
+
+
+4. each nation name,order_priority  wise  total amount and no of orders total order amount grater than 2000000
+A. SELECT N.N_NAME Nation_Name, O.O_ORDERPRIORITY Order_Priority, SUM(O.O_TOTALPRICE) Total_Amount, COUNT(O.O_ORDERKEY) No_of_Orders FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.NATION N INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.CUSTOMER C ON(N.N_NATIONKEY = C.C_NATIONKEY) INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS O ON(C.C_CUSTKEY = O.O_CUSTKEY) WHERE O.O_TOTALPRICE > 200000 GROUP BY Nation_Name, Order_Priority;
+
+
+5. each year wise no of orders and order total amount from the order date
+A. SELECT EXTRACT(YEAR FROM O_ORDERDATE) Order_Year, COUNT(O_ORDERKEY) No_of_Orders, SUM(O_TOTALPRICE) Order_Total_Amount FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS GROUP BY Order_Year ORDER BY Order_Year;
+
+6. each nation_name,year wise no of orders and order total amount from the order date 
+A. SELECT N.N_NAME Nation_Name, EXTRACT(YEAR FROM O.O_ORDERDATE) No_of_Orders, SUM(O.O_TOTALPRICE) Total_Amount FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.NATION N INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.CUSTOMER C ON(N.N_NATIONKEY = C.C_NATIONKEY) INNER JOIN SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS O ON(C.C_CUSTKEY = O.O_CUSTKEY) GROUP BY Nation_Name, No_of_Orders ORDER BY No_of_Orders;
+
+7. 
+a
+==
+1
+1
+1
+null
+1
+
+b
+=
+1
+1
+null
+null
+null
+1
+
+if i use the all the join types what is result for each join type
+inner
+left
+right
+full
+
+A. CREATE TABLE Table1 (Emp_No Number);
+
+CREATE TABLE Table2 (Emp_No Number);
+
+INSERT INTO Table1 VALUES (1);
+INSERT INTO Table1 VALUES (1);
+INSERT INTO Table1 VALUES (1);
+INSERT INTO Table1 VALUES (null);
+INSERT INTO Table1 VALUES (1);
+
+INSERT INTO Table2 VALUES (1);
+INSERT INTO Table2 VALUES (1);
+INSERT INTO Table2 VALUES (null);
+INSERT INTO Table2 VALUES (null);
+INSERT INTO Table2 VALUES (null);
+INSERT INTO Table2 VALUES (1);
+
+SELECT * FROM Table1 T1 INNER JOIN Table2 T2 ON (T1.EMP_NO = T2.EMP_NO);
+Sno	EMP_NO	EMP_NO_2
+1	1	1
+2	1	1
+3	1	1
+4	1	1
+5	1	1
+6	1	1
+7	1	1
+8	1	1
+9	1	1
+10	1	1
+11	1	1
+12	1	1
+
+SELECT * FROM Table1 T1 LEFT JOIN Table2 T2 ON (T1.EMP_NO = T2.EMP_NO);
+Sno	EMP_NO	EMP_NO_2
+1	1	1
+2	1	1
+3	1	1
+4	1	1
+5	1	1
+6	1	1
+7	1	1
+8	1	1
+9	1	1
+10	null  null	
+11	1	1
+12	1	1
+13	1	1
+
+SELECT * FROM Table1 T1 RIGHT JOIN Table2 T2 ON (T1.EMP_NO = T2.EMP_NO);
+Sno	EMP_NO	EMP_NO_2
+1	1	1
+2	1	1
+3	1	1
+4	1	1
+5	1	1
+6	1	1
+7	1	1
+8	1	1
+9	null  null	
+10	null  null	
+11	null  null	
+12	1	1
+13	1	1
+14	1	1
+15	1	1
+
+SELECT * FROM Table1 T1 FULL JOIN Table2 T2 ON (T1.EMP_NO = T2.EMP_NO);
+sno	EMP_NO	EMP_NO_2
+1	1	1
+2	1	1
+3	1	1
+4	1	1
+5	1	1
+6	1	1
+7	1	1
+8	1	1
+9	null  null	
+10	null  null	
+11	null  null	
+12	1	1
+13	1	1
+14	1	1
+15	1	1
+16	null	null
